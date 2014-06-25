@@ -12,6 +12,7 @@ To use JYM, include the .js file on the page and call the initialization method
         $(function() {
         	$(".jym-inputs").initJYM();
         });
+    </script>
 ```
 
 Adding a JYM input field to the page is simple:
