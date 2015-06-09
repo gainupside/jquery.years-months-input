@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<title>JYM Test</title>
+		<link rel="stylesheet" type="text/css" href="jquery-ui.min.css">
+		<script src="jquery-1.11.3.min.js"></script>
+		<script src="jquery-ui.min.js"></script>
+		<script src="../jquery.years-months-input.js"></script>
+	    <script type="text/javascript">
+	        $(function() {
+	            $(".jym-inputs").initJYM({
+	            	value: 60,
+	            	min: 36,
+	            	max: 120
+	            });
+	        });
+	    </script>
+	</head>
+	<body>
+		<h1>JYM Test</h1>
+		<div class="jym-inputs">
+	        <input class="jym-years" type="text" placeholder="Years" />
+	        <span>yrs</span>
+			<input class="jym-months" type="text" placeholder="Months" />
+			<span>mos</span>
+    	</div>
+	</body>
+</html>
