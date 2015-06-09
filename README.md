@@ -7,20 +7,24 @@ jQuery plugin that implements a simple years and months input controlled either 
 
 To use JYM, include the .js file on the page and call the initialization method
 ```html
-    <script src="jquery.years-months-input.js"></script>
-    <script type="text/javascript">
-        $(function() {
-        	$(".jym-inputs").initJYM();
-        });
-    </script>
+        <script src="jquery-1.11.3.min.js"></script>
+        <script src="jquery-ui.min.js"></script>
+        <script src="jquery.years-months-input.js"></script>
+        <script type="text/javascript">
+            $(function() {
+                $(".jym-inputs").initJYM({
+                    value: 60,
+                    min: 36,
+                    max: 120
+                });
+            });
+        </script>
 ```
 
 Adding a JYM input field to the page is simple:
 ```html
-    <div class="jym-inputs">
-        <input class="jym-years" type="text" />
-        <input class="jym-months" type="text" />
-        <input class="jym-up" type="button" value="+" />
-        <input class="jym-down" type="button" value="-" />
-    </div>
+        <div class="jym-inputs">
+            <input class="jym-years" type="text" placeholder="Years" />
+            <input class="jym-months" type="text" placeholder="Months" />
+        </div>
 ```
