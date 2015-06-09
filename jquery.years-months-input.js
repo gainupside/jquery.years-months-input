@@ -1,76 +1,108 @@
 /**
  * Created by silatham99 on 6/25/14.
+ * version 2.0.0 - updated 8/21/14
+ * dependencies:
+ *      jQuery >=1.11
+ *      jQuery UI >=1.10.4
  */
+
 (function($) {
 
-    $.fn.initJYM = function() {
-        this.children('.jym-months').val(0);
-        this.children('.jym-years').val(0);
+    $.fn.initJYM = function(options) {
+        var self = this,
+            yearField = self.children('.jym-years'),
+            monthField = self.children('.jym-months'),
 
-        this.children(':button').click(function(e){
-            handleButtonClick(e.delegateTarget);
-        });
+            initialValue = options.value,
+            minimumYears = options.min,
+            maximumYears = options.max,
 
-        this.children('.jym-months').change(function(e){
-            handleManualMonthChange(e.delegateTarget);
-        });
+
+            callbackHandler = function() {
+                if (options.onUpdate) {
+                    var totalMonths = _getTotal(yearField, monthField);
+                    if (totalMonths <= (maximumYears * 12) && totalMonths >= (minimumYears * 12)) {
+                        options.onUpdate(totalMonths);
+                    }
+                }
+            },
+            spinStartHandler = function(event) {
+                if (options.start) {
+                    options.start(event);
+                }
+            },
+            spinHandler = function(event, ui) {
+                if (ui.value > 11 && _getYears(yearField) < maximumYears) {
+                    _updateMonths(monthField, 0);
+                    _updateYears(yearField, (_getYears(yearField) + 1));
+                    return false;
+                } else if (ui.value < 0 && _getYears(yearField) > minimumYears) {
+                    _updateMonths(monthField, 11);
+                    _updateYears(yearField, (_getYears(yearField) - 1));
+                    return false;
+                } else if (ui.value > 0 && _getYears(yearField) === maximumYears) {
+                    // User is spinning up and has reached the max years
+                    _updateMonths(monthField, 0);
+                    return false;
+                } else if (ui.value < 0 && _getYears(yearField) === minimumYears) {
+                    // User is spinning down and has reached the min years
+                    _updateMonths(monthField, 0);
+                    return false;
+                }
+            },
+            yearChangeHandler = function() {
+                if (_getYears(yearField) < minimumYears || isNaN(_getYears(yearField))) {
+                    _updateYears(yearField, minimumYears);
+                } else if (_getYears(yearField) > maximumYears || isNaN(_getYears(yearField))) {
+                    _updateYears(yearField, maximumYears);
+                    _updateMonths(monthField, 0);
+                }
+                callbackHandler();
+            },
+            monthChangeHandler = function() {
+                if (isNaN(_getMonths(monthField)) || _getMonths(monthField) === null ||
+                    (_getYears(yearField) === maximumYears && _getMonths(monthField) > 0 && _getMonths(monthField) < 12)) {
+                    _updateMonths(monthField, 0);
+                }
+            },
+            spinSettings = {
+                min: -1,
+                max: 12,
+                step: 1,
+                spin: spinHandler,
+                stop: callbackHandler,
+                change: monthChangeHandler,
+                start: spinStartHandler
+            };
+
+        monthField.spinner(spinSettings);
+        yearField.on('change', yearChangeHandler);
+
+        _updateYears(yearField, Math.floor(initialValue / 12));
+        _updateMonths(monthField, initialValue % 12);
     };
 
-
-    var getYears = function(field) {
-        return parseInt(field.val(), 10);
+    $.fn.updateJYM = function(newValue) {
+        var self = this,
+            yearField = self.children('.jym-years'),
+            monthField = self.find('.jym-months');
+        _updateYears(yearField, Math.floor(newValue / 12));
+        _updateMonths(monthField, (newValue % 12));
     };
 
-    var getMonths = function(field) {
-        return parseInt(field.val(), 10);
+    $.fn.disableJYM = function(disableSwitch) {
+        var self = this,
+            yearField = self.children('.jym-years'),
+            monthField = self.find('.jym-months');
+
+        monthField.spinner('option', 'disabled', disableSwitch);
+        yearField.prop('disabled', disableSwitch);
     };
 
-    var updateMonths = function(field, value) {
-        field.val(value);
-    };
-
-    var updateYears = function(field, value) {
-        field.val(value);
-    };
-
-    function handleButtonClick(buttonClicked) {
-        var monthField = $(buttonClicked).siblings('.jym-months'),
-            yearField = $(buttonClicked).siblings('.jym-years');
-
-        if ($(buttonClicked).hasClass('jym-up')) {
-            incrementFields(monthField, yearField);
-        } else if ($(buttonClicked).hasClass('jym-down')) {
-            decrementFields(monthField, yearField);
-        }
-    }
-
-    function handleManualMonthChange(monthField) {
-        var monthField = $(monthField),
-            yearField = $(monthField).siblings('.jym-years'),
-            monthsToYears = Math.floor(getMonths(monthField) / 12);
-
-        if (monthsToYears >= 1) {
-            updateYears(yearField, monthsToYears);
-            updateMonths(monthField, getMonths(monthField) % 12);
-        }
-    }
-
-    function incrementFields(monthField, yearField) {
-        if (getMonths(monthField) >= 11){
-            updateMonths(monthField, 0);
-            updateYears(yearField, getYears(yearField) + 1);
-        } else {
-            updateMonths(monthField, getMonths(monthField) + 1);
-        }
-    }
-
-    function decrementFields(monthField, yearField) {
-        if (getMonths(monthField) <= 1 && getYears(yearField) > 0){
-            updateMonths(monthField, 11);
-            updateYears(yearField, getYears(yearField) - 1);
-        } else if (getMonths(monthField) >= 1) {
-            updateMonths(monthField, getMonths(monthField) - 1);
-        }
-    }
+    var _getYears = function(field) { return parseInt(field.val(), 10);},
+        _getMonths = function(field) { return field.spinner('value');},
+        _getTotal = function(yearField, monthField) { return (_getYears(yearField) * 12) +_getMonths(monthField);},
+        _updateYears = function(field, value) { field.val(value);},
+        _updateMonths = function(field, value) { field.spinner('value', value);};
 
 }(jQuery));
