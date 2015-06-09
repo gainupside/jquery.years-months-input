@@ -1,7 +1,7 @@
 jquery.years-months-input
 =========================
 
-jQuery plugin that implements a simple years and months input controlled either by +/- buttons or by typing directly in the fields.
+jQuery plugin that implements a simple years and months input controlled by the jQuery UI spinner or by typing in the field.
 
 ## Usage:
 
