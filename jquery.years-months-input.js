@@ -14,14 +14,14 @@
             monthField = self.children('.jym-months'),
 
             initialValue = options.value,
-            minimumYears = options.min,
-            maximumYears = options.max,
+            minimumMonths = options.min,
+            maximumMonths = options.max,
 
 
             callbackHandler = function() {
                 if (options.onUpdate) {
                     var totalMonths = _getTotal(yearField, monthField);
-                    if (totalMonths <= (maximumYears * 12) && totalMonths >= (minimumYears * 12)) {
+                    if (totalMonths <= (maximumMonths * 12) && totalMonths >= (minimumMonths * 12)) {
                         options.onUpdate(totalMonths);
                     }
                 }
@@ -32,19 +32,19 @@
                 }
             },
             spinHandler = function(event, ui) {
-                if (ui.value > 11 && _getYears(yearField) < maximumYears) {
+                if (ui.value > 11 && _getTotal(yearField, monthField) < maximumMonths) {
                     _updateMonths(monthField, 0);
                     _updateYears(yearField, (_getYears(yearField) + 1));
                     return false;
-                } else if (ui.value < 0 && _getYears(yearField) > minimumYears) {
+                } else if (ui.value < 0 && _getTotal(yearField, monthField) > minimumMonths) {
                     _updateMonths(monthField, 11);
                     _updateYears(yearField, (_getYears(yearField) - 1));
                     return false;
-                } else if (ui.value > 0 && _getYears(yearField) === maximumYears) {
+                } else if (ui.value > 0 && _getTotal(yearField, monthField) === maximumMonths) {
                     // User is spinning up and has reached the max years
                     _updateMonths(monthField, 0);
                     return false;
-                } else if (ui.value < 0 && _getYears(yearField) === minimumYears) {
+                } else if (ui.value < 0 && _getTotal(yearField, monthField) === minimumMonths) {
                     // User is spinning down and has reached the min years
                     _updateMonths(monthField, 0);
                     return false;
@@ -61,7 +61,7 @@
             },
             monthChangeHandler = function() {
                 if (isNaN(_getMonths(monthField)) || _getMonths(monthField) === null ||
-                    (_getYears(yearField) === maximumYears && _getMonths(monthField) > 0 && _getMonths(monthField) < 12)) {
+                    (_getYears(yearField) === (maximumMonths % 12) && _getMonths(monthField) > 0 && _getMonths(monthField) < 12)) {
                     _updateMonths(monthField, 0);
                 }
             },
